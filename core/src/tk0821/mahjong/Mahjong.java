@@ -6,26 +6,26 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class Mahjong extends ApplicationAdapter {
 
 	private Tiles tiles;
-	private Tiles hands1;
-	private Tiles hands2;
-	private Tiles hands3;
-	private Tiles hands4;
+	private Tiles hand1;
+	private Tiles hand2;
+	private Tiles hand3;
+	private Tiles hand4;
 	
 	@Override
 	public void create() {
 		tiles = new Tiles();
 		tiles.generateWall();
-		tiles.printWall();
+		//tiles.printWall();
 		
-		hands1 = tiles.createHands();
-		hands1.printTiles();
-		hands2 = tiles.createHands();
-		hands2.printTiles();
-		hands3 = tiles.createHands();
-		hands3.printTiles();
-		hands4 = tiles.createHands();
-		hands4.printTiles();
-		tiles.printTiles();
+		hand1 = tiles.createHand();
+		hand1.printTilesName();
+		hand2 = tiles.createHand();
+		hand2.printTilesName();
+		hand3 = tiles.createHand();
+		hand3.printTilesName();
+		hand4 = tiles.createHand();
+		hand4.printTilesName();
+		//tiles.printTiles();
 	}
 
 	@Override
