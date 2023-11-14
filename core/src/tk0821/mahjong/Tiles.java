@@ -75,7 +75,7 @@ public class Tiles {
 		if (tilesIndex < WINDS) {
 			if (tilesIndex < CIRCLES) {
 				sb.append(tilesIndex + 1 + "萬");
-			} else if (tilesIndex + 1 < BAMBOOS) {
+			} else if (tilesIndex < BAMBOOS) {
 				sb.append(tilesIndex % SUIT_RENGE + 1 + "筒");
 			} else {
 				sb.append(tilesIndex % SUIT_RENGE + 1 + "索");
@@ -83,28 +83,28 @@ public class Tiles {
 		} else if (tilesIndex < DRAGONS) {
 			switch (tilesIndex % WINDS_RENGE) {
 			case 0:
-				sb.append("南");
+				sb.append("南 ");
 				break;
 			case 1:
-				sb.append("西");
+				sb.append("西 ");
 				break;
 			case 2:
-				sb.append("北");
+				sb.append("北 ");
 				break;
 			case 3:
-				sb.append("東");
+				sb.append("東 ");
 				break;
 			}
 		} else {
 			switch (tilesIndex % DRAGONS_RENGE) {
 			case 0:
-				sb.append("中");
+				sb.append("中 ");
 				break;
 			case 1:
-				sb.append("白");
+				sb.append("白 ");
 				break;
 			case 2:
-				sb.append("發");
+				sb.append("發 ");
 				break;
 			}
 		}
