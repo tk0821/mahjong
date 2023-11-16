@@ -57,7 +57,7 @@ public class TileTextures {
 			path = CHARACTERS_DIR + CHARACTERS_PREFIX;
 			break;
 		case Tile.CIRCLES:
-			path = CIRCLES_DIR + CHARACTERS_PREFIX;
+			path = CIRCLES_DIR + CIRCLES_PREFIX;
 			break;
 		case Tile.BAMBOOS:
 			path = BAMBOOS_DIR + BAMBOOS_PREFIX;

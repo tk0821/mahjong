@@ -54,6 +54,13 @@ public class Tile implements Comparable<Tile> {
 		this.kind = kind;
 	}
 
+	public int getValue() {
+		if (kind == HONOURS) {
+			return getHonoursValue();
+		}
+		return getSuitValue();
+	}
+	
 	public int getSuitValue() {
 		return suitValue;
 	}

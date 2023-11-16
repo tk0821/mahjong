@@ -11,7 +11,7 @@ public class Table {
 	private static final int FULL_TILES = TILES * IDENTICIAL_TILES;
 	private static final int DEAD_WALL = 14;
 	private static final int DEAD_WALL_START = FULL_TILES - DEAD_WALL;
-	private static final int HAND = 13;
+	public static final int HAND = 13;
 
 	private List<Tile> wall;
 	private int wallIndex;
