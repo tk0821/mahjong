@@ -8,12 +8,15 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class Mahjong extends ApplicationAdapter {
 	
+	TileTextures tileTextures;
 	Table table;
 	List<Tile> hand;
 
 	@Override
 	public void create() {
 	
+		tileTextures = new TileTextures();
+		
 		table = new Table();
 
 		table.generateWall();
@@ -29,6 +32,9 @@ public class Mahjong extends ApplicationAdapter {
 	@Override
 	public void render() {
 		ScreenUtils.clear(0, 0, 0, 1);
+		
+		
+		
 	}
 
 	@Override

@@ -7,7 +7,8 @@ public class Tile implements Comparable<Tile> {
 	public static final int CIRCLES = 2;
 	public static final int BAMBOOS = 3;
 	public static final int HONOURS = 4;
-
+	public static final int KIND = 4;
+	
 	// honoursValue
 	public static final int EAST = 1;
 	public static final int SOUTH = 2;
@@ -21,6 +22,17 @@ public class Tile implements Comparable<Tile> {
 	public static final int SUIT_RANGE = 9;
 	public static final int HONOURS_RANGE = 7;
 
+	// direction
+	public static final int DIRECTION = 5;
+	public static final int HAND = 1;
+	public static final int DISPLAY = 2;
+	public static final int DISPLAY_REVERSE = 3;
+	public static final int DISPLAY_LEFT = 4;
+	public static final int DISPLAY_RIGHT = 5;
+	// public static final int HAND_REVERSE = 6;
+	// public static final int HAND_LEFT = 7;
+	// public static final int HAND_RIGHT = 8;
+	
 	private int kind; // 萬子,筒子,索子,字牌
 	private int suitValue; //	[1, 9]
 	private int honoursValue; // 東,南,西,北,白,發,中
