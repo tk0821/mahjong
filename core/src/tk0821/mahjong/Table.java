@@ -16,6 +16,14 @@ public class Table {
 	private List<Tile> wall;
 	private int wallIndex;
 
+	public boolean canGetWallTop() {
+		return (wallIndex < DEAD_WALL_START);
+	}
+	
+	public Tile getWallTop() {
+		return wall.get(wallIndex++);
+	}
+	
 	public void generateWall() {
 		wallIndex = 0;
 
@@ -31,7 +39,7 @@ public class Table {
 		}
 		Collections.shuffle(wall);
 	}
-
+	
 	public List<Tile> generateHand() {
 		List<Tile> hand = new ArrayList<>();
 		for (int i = 0; i < HAND; i++) {
