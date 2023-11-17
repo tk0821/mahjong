@@ -2,6 +2,7 @@ package tk0821.mahjong;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -16,7 +17,7 @@ public class Mahjong extends ApplicationAdapter {
 	private int tileW;
 	private int tileH;
 
-	private static final int HAND_X = 400;
+	private static final int HAND_X = 300;
 	private static final int HAND_Y = 100;
 	private static final int WINDOW_X = 1280;
 	private static final int WINDOW_Y = 720;
@@ -52,16 +53,14 @@ public class Mahjong extends ApplicationAdapter {
 		ScreenUtils.clear(0, 0, 0, 1);
 
 		batch.begin();
-
 		for (int i = 0; i < Table.HAND; i++) {
-			batch.draw(tileTextures.getTileTexture(player.getHand().get(i).getKind(),
-					player.getHand().get(i).getValue(), Tile.HAND), HAND_X + (i * tileW), HAND_Y);
+			Texture texture = tileTextures.getTileTexture(player.getHand().get(i).getKind(),player.getHand().get(i).getValue(), Tile.HAND);
+			batch.draw(texture, HAND_X + (i * tileW), HAND_Y);
 		}
 		if (player.getHasTile()) {
-			batch.draw(tileTextures.getTileTexture(player.getTile().getKind(),
-					player.getTile().getValue(), Tile.HAND), HAND_X + ((player.getHand().size() + 1) * tileW), HAND_Y);
+			Texture texture = tileTextures.getTileTexture(player.getTile().getKind(), player.getTile().getValue(), Tile.HAND);
+			batch.draw(texture, HAND_X + ((player.getHand().size() + 1) * tileW), HAND_Y);
 		}
-
 		batch.end();
 
 		if (isClicked) {
