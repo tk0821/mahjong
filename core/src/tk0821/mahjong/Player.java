@@ -5,12 +5,21 @@ import java.util.List;
 
 public class Player {
 	
+	private int id;
 	private List<Tile> hand;
 	private Tile tile;
 	private boolean hasTile;
 
-	public Player() {
-		
+	public Player(int id) {
+		setId(id);
+	}
+	
+	public int getId() {
+		return id;
+	}
+
+	private void setId(int id) {
+		this.id = id;
 	}
 	
 	public void setHasTile(boolean hasTile) {

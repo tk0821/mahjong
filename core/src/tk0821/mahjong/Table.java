@@ -13,7 +13,16 @@ public class Table {
 	private static final int DEAD_WALL_START = FULL_TILES - DEAD_WALL;
 	public static final int HAND = 13;
 
+	public static final int PLAYERS = 4;
+	
+	// discards
+	public static final int PLAYER = 0;
+	public static final int COM1 = 1;
+	public static final int COM2 = 2;
+	public static final int COM3 = 3;
+	
 	private List<Tile> wall;
+	private List<List<Tile>> discards;
 	private int wallIndex;
 
 	public boolean canGetWallTop() {
@@ -22,6 +31,22 @@ public class Table {
 	
 	public Tile getWallTop() {
 		return wall.get(wallIndex++);
+	}
+	
+	public void addTileToDiscard(Tile tile, int playerId) {
+		discards.get(playerId).add(tile);
+	}
+	
+	public List<Tile> getDiscard(int playerId) {
+		return discards.get(playerId);
+	}
+	
+	public void generateDiscards() {
+		discards = new ArrayList<>();
+		for (int i = 0; i < PLAYERS; i++) {
+			List<Tile> list = new ArrayList<>();
+			discards.add(list);
+		}
 	}
 	
 	public void generateWall() {
@@ -40,7 +65,7 @@ public class Table {
 		Collections.shuffle(wall);
 	}
 	
-	public List<Tile> generateHand() {
+	public List<Tile> dealHand() {
 		List<Tile> hand = new ArrayList<>();
 		for (int i = 0; i < HAND; i++) {
 			hand.add(wall.get(wallIndex++));
