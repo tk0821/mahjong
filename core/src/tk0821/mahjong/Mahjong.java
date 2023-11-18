@@ -22,16 +22,19 @@ public class Mahjong extends ApplicationAdapter {
 	private int discardTileW;
 	private int discardTileH;
 
-	private static final int HAND_X = 270;
+	private int backTileW;
+	private int backTileH;
+
+	private static final int HAND_X = 400;
 	private static final int HAND_Y = 30;
 	private static final int WINDOW_X = 1280;
 	private static final int WINDOW_Y = 720;
 
-	private static final int DISCARD_PLAYER_X = 400;
-	private static final int DISCARD_PLAYER_Y = 300;
+	private static final int DISCARD_PLAYER_X = 500;
+	private static final int DISCARD_PLAYER_Y = 230;
 
-	SpriteBatch batch;
-	TileTextures tileTextures;
+	static SpriteBatch batch;
+	static TileTextures tileTextures;
 
 	Table table;
 	Player player;
@@ -39,6 +42,8 @@ public class Mahjong extends ApplicationAdapter {
 	Player com2;
 	Player com3;
 
+	HandRenderer handRenderer;
+	
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
@@ -49,6 +54,8 @@ public class Mahjong extends ApplicationAdapter {
 		tileH = tileTextures.getTileTexture(1, 1, 1).getHeight();
 		discardTileW = tileTextures.getTileTexture(1, 1, Tile.DISPLAY).getWidth();
 		discardTileH = tileTextures.getTileTexture(1, 1, Tile.DISPLAY).getHeight();
+		backTileW = tileTextures.getBackTileTexture(Tile.DISPLAY).getWidth();
+		backTileH = tileTextures.getBackTileTexture(Tile.DISPLAY).getHeight();
 
 		table = new Table();
 		table.generateWall();
@@ -57,16 +64,18 @@ public class Mahjong extends ApplicationAdapter {
 		player = new Player(Table.PLAYER);
 		player.setHand(table.dealHand());
 		player.sortHand();
-		
+
 		com1 = new Player(Table.COM1);
 		com1.setHand(table.dealHand());
-		
+
 		com2 = new Player(Table.COM2);
 		com2.setHand(table.dealHand());
-		
+
 		com3 = new Player(Table.COM3);
 		com3.setHand(table.dealHand());
 
+		handRenderer = new HandRenderer();
+		
 		inputProcessor = new MyInputProcessor();
 		Gdx.input.setInputProcessor(inputProcessor);
 	}
@@ -76,19 +85,13 @@ public class Mahjong extends ApplicationAdapter {
 		ScreenUtils.clear(0, 0.33f, 0.33f, 1);
 
 		batch.begin();
-		for (int i = 0; i < Table.HAND; i++) {
-			Texture texture = tileTextures.getTileTexture(player.getHand().get(i).getKind(),
-					player.getHand().get(i).getValue(), Tile.HAND);
-			batch.draw(texture, HAND_X + (i * tileW), HAND_Y);
-		}
-		
-		for (int i = 0; i < Table.HAND; i++) {
-			Texture texture = tileTextures.getTileTexture(com1.getHand().get(i).getKind(),
-					player.getHand().get(i).getValue(), Tile.HAND);
-			batch.draw(texture, HAND_X + (i * tileW), HAND_Y);
-		}		
-		
-		
+
+		handRenderer.draw(player.getHand(), player.getId());
+		handRenderer.draw(com1.getHand(), com1.getId());
+		handRenderer.draw(com2.getHand(), com2.getId());
+		handRenderer.draw(com3.getHand(), com3.getId());
+
+
 		if (player.getHasTile()) {
 			Texture texture = tileTextures.getTileTexture(player.getTile().getKind(), player.getTile().getValue(),
 					Tile.HAND);
@@ -96,18 +99,29 @@ public class Mahjong extends ApplicationAdapter {
 		}
 
 		// TODO: loop
-		List<Tile> discard = table.getDiscard(player.getId());
-		for (int i = 0; i < discard.size(); i++) {
-			int column = i < 18 ? i / 6 : 2;
-			int row = i < 18 ? i % 6 : i - 12;
-			Texture texture = tileTextures.getTileTexture(discard.get(i).getKind(), discard.get(i).getValue(),
-					Tile.DISPLAY);
-			batch.draw(texture, DISCARD_PLAYER_X + (row * discardTileW), DISCARD_PLAYER_Y - (column * discardTileH));
+		List<Tile> discard = table.getDiscard(0);
+
+		int x = 0;
+		int y = 0;
+		int direction = 0;
+
+		x = DISCARD_PLAYER_X;
+		y = DISCARD_PLAYER_Y;
+		direction = Tile.DISPLAY;
+
+		for (int j = 0; j < discard.size(); j++) {
+			int column = j < 18 ? j / 6 : 2;
+			int row = j < 18 ? j % 6 : j - 12;
+			Texture texture = tileTextures.getTileTexture(discard.get(j).getKind(), discard.get(j).getValue(),
+					direction);
+			batch.draw(texture, x + (row * discardTileW), y - (column * discardTileH));
 		}
 
 		batch.end();
 
-		if (isClicked) {
+		if (isClicked)
+
+		{
 			if (player.getHasTile()) {
 				int index = (int) Math.floor((mouseX - HAND_X) / tileW);
 				if (mouseX - HAND_X >= 0 && index < player.getHand().size()) {
@@ -118,6 +132,7 @@ public class Mahjong extends ApplicationAdapter {
 					table.addTileToDiscard(player.discard(player.getHand().size()), player.getId());
 				}
 				player.sortHand();
+
 			} else if (table.canGetWallTop()) {
 				player.setTile(table.getWallTop());
 			}

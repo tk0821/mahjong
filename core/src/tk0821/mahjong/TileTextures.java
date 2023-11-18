@@ -11,17 +11,20 @@ public class TileTextures {
 	private static final String CIRCLES_DIR = "circles/";
 	private static final String BAMBOOS_DIR = "bamboos/";
 	private static final String HONOURS_DIR = "honours/";
+	private static final String BACK_DIR = "back/";
 
 	// prefix
 	private static final String CHARACTERS_PREFIX = "CH_";
 	private static final String CIRCLES_PREFIX = "CI_";
 	private static final String BAMBOOS_PREFIX = "BA_";
 	private static final String HONOURS_PREFIX = "HO_";
+	private static final String BACK_TILE_PREFIX = "back_";
 	
 	// extension
 	private static final String EXTENSION = ".gif";
 
 	private Texture[][][] textures; // kind, value, direction
+	private Texture[] backTileTexture;
 
 	public TileTextures() {
 		textures = new Texture[Tile.KIND+1][][];	// use a one-based index
@@ -34,8 +37,17 @@ public class TileTextures {
 				}
 			}
 		}
+		
+		backTileTexture = new Texture[Tile.DIRECTION+1];
+		for (int i = 1; i <= Tile.DIRECTION; i++) {
+			backTileTexture[i] = new Texture(Gdx.files.internal(TILES_DIR+BACK_DIR+BACK_TILE_PREFIX+i+EXTENSION));
+		}
 	}
 
+	public Texture getBackTileTexture(int direction) {
+		return backTileTexture[direction];
+	}
+	
 	public Texture getTileTexture(int kind, int value, int direction) {
 		return textures[kind][value][direction];
 	}
