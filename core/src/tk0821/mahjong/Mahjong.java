@@ -61,6 +61,7 @@ public class Mahjong extends ApplicationAdapter {
 
 		inputProcessor = new MyInputProcessor();
 		Gdx.input.setInputProcessor(inputProcessor);
+		
 	}
 
 	@Override
@@ -73,13 +74,14 @@ public class Mahjong extends ApplicationAdapter {
 			discardRenderer.draw(table.getDiscard(i), players[i].getId());
 		}
 		batch.end();
-	
+	/*
 		if (time > 0.3f) {
 			if (table.canGetWallTop() && !players[currentPlayer].getHasTile()) {
 				drawTile();
 			} else if (currentPlayer != Table.PLAYER && players[currentPlayer].getHasTile()) {
 				discardTile();
 			} else if (isClicked && currentPlayer == Table.PLAYER) {
+				WaitingHandChecker.isWaitingHand(players[0].getHand(), players[0].getTile());
 				playerTurn();
 			} else if (!table.canGetWallTop()) {
 				System.out.println("drawn game");
@@ -89,6 +91,7 @@ public class Mahjong extends ApplicationAdapter {
 		}
 		
 		time+=Gdx.graphics.getDeltaTime();
+	*/
 	}
 	
 	private void drawTile() {
