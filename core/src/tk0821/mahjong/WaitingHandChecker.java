@@ -5,8 +5,299 @@ import java.util.List;
 
 public class WaitingHandChecker {
 
-	public static List<Tile> parseHand(String handString) {
-		// String2文字で1牌を表すとする
+	private boolean[] winningTileList;
+	private int headTileIndex = -1;
+
+	public WaitingHandChecker() {
+		winningTileList = new boolean[34];
+	}
+
+	public String parseWinningTileList() {
+
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < 27; i++) {
+			if (winningTileList[i]) {
+				sb.append(i % 9 + 1);
+
+				if (i < 9) {
+					sb.append("m");
+				} else if (i < 18) {
+					sb.append("p");
+				} else {
+					sb.append("s");
+				}
+			}
+		}
+
+		if (winningTileList[27]) {
+			sb.append("東 ");
+		}
+		if (winningTileList[28]) {
+			sb.append("南 ");
+		}
+		if (winningTileList[29]) {
+			sb.append("西 ");
+		}
+		if (winningTileList[30]) {
+			sb.append("北 ");
+		}
+		if (winningTileList[31]) {
+			sb.append("白 ");
+		}
+		if (winningTileList[32]) {
+			sb.append("發 ");
+		}
+		if (winningTileList[33]) {
+			sb.append("中 ");
+		}
+		System.out.println(sb);
+		return sb.toString();
+	}
+
+	public boolean[] getWinningTileList() {
+		return winningTileList;
+	}
+
+	public boolean isWaitingHand(String handString) {
+
+		for (int i = 0; i < 34; i++) {
+			winningTileList[i] = false;
+		}
+
+		List<Tile> playerHand = parseHand(handString);
+		int[] tileCount = new int[34];
+		for (var t : playerHand) {
+			tileCount[(t.getKind() - 1) * 9 + (t.getValue() - 1)]++;
+		}
+		print(tileCount);
+		if (!checkThirteenOrphans(tileCount)) {
+			bt(tileCount, 0, false);
+		}
+		for (var f : winningTileList) {
+			if (f) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isWaitingHand(List<Tile> playerHand, Tile tile) {
+
+		for (int i = 0; i < 34; i++) {
+			winningTileList[i] = false;
+		}
+		
+		int[] tileCount = new int[34];
+		tileCount[(tile.getKind() - 1) * 9 + (tile.getValue() - 1)]++;
+		for (var t : playerHand) {
+			tileCount[(t.getKind() - 1) * 9 + (t.getValue() - 1)]++;
+		}
+		if (!checkThirteenOrphans(tileCount)) {
+			bt(tileCount, 0, false);
+		}
+		for (var f : winningTileList) {
+			if (f) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isWaitingHand(List<Tile> playerHand) {
+
+		for (int i = 0; i < 34; i++) {
+			winningTileList[i] = false;
+		}
+
+		int[] tileCount = new int[34];
+		for (var t : playerHand) {
+			tileCount[(t.getKind() - 1) * 9 + (t.getValue() - 1)]++;
+		}
+		print(tileCount);
+		if (!checkThirteenOrphans(tileCount)) {
+			bt(tileCount, 0, false);
+		}
+		for (var f : winningTileList) {
+			if (f) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean bt(int[] tileCount, int setCount, boolean hasHead) {
+
+		for (int i = 0; i < 34; i++) {
+			if (!hasHead) {
+				if (tileCount[i] >= 2) {
+					headTileIndex = i;
+					tileCount[i] -= 2;
+					bt(tileCount, 0, true);
+					headTileIndex = -1;
+					tileCount[i] += 2;
+				}
+			}
+			if (i % 9 < 8 && i < 27 && tileCount[i] >= 1 && tileCount[i + 1] >= 1 && tileCount[i + 2] >= 1) {
+				tileCount[i] -= 1;
+				tileCount[i + 1] -= 1;
+				tileCount[i + 2] -= 1;
+				bt(tileCount, setCount + 1, hasHead);
+				tileCount[i] += 1;
+				tileCount[i + 1] += 1;
+				tileCount[i + 2] += 1;
+			}
+
+			if (tileCount[i] >= 3) {
+				tileCount[i] -= 3;
+				bt(tileCount, setCount + 1, hasHead);
+				tileCount[i] += 3;
+			}
+
+		}
+
+		if (hasHead) {
+			if (setCount >= 3) {
+				for (int i = 0; i < 34; i++) {
+					if (tileCount[i] == 2) {
+						winningTileList[i] = true;
+						winningTileList[headTileIndex] = true;
+						return true;
+					}
+					if ((i % 9) < ((i + 1) % 9) && i < 27) {
+						if (tileCount[i] == 1 && tileCount[i + 1] == 1) {
+							if (i % 9 < 7) {
+								winningTileList[i + 2] = true;
+							}
+							if (i % 9 > 0) {
+								winningTileList[i - 1] = true;
+							}
+							return true;
+						}
+					}
+
+					if ((i % 9) < ((i + 2) % 9) && i < 27) {
+						if (tileCount[i] == 1 && tileCount[i + 2] == 1) {
+							winningTileList[i + 1] = true;
+							return true;
+						}
+					}
+				}
+			}
+			checkSevenPairs(tileCount);
+		} else {
+			if (setCount == 4) {
+
+				for (int i = 0; i < 34; i++) {
+					if (tileCount[i] == 1) {
+						winningTileList[i] = true;
+					}
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean checkSevenPairs(int[] tileCount) {
+		int pairCount = 0;
+		for (var x : tileCount) {
+			if (x == 2) {
+				pairCount++;
+			}
+		}
+		if (pairCount >= 5) {
+			for (var x : tileCount) {
+				if (x == 1) {
+					winningTileList[x] = true;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private boolean checkThirteenOrphans(int[] tileCount) {
+		// 0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33
+
+		boolean hasHead = false;
+		int cnt = 0;
+		for (int i = 0; i < 3; i++) {
+			if (tileCount[i * 9] >= 1) {
+				if (tileCount[i * 9] >= 2) {
+					hasHead = true;
+				}
+				cnt++;
+			}
+			if (tileCount[(i + 1) * 9 - 1] >= 1) {
+				if (tileCount[(i + 1) * 9 - 1] >= 2) {
+					hasHead = true;
+				}
+				cnt++;
+			}
+		}
+		for (int i = 27; i < 34; i++) {
+			if (tileCount[i] >= 1) {
+				if (tileCount[i] >= 2) {
+					hasHead = true;
+				}
+				cnt++;
+			}
+		}
+		if (cnt >= 13 || (hasHead && cnt >= 12)) {
+
+			if (!hasHead || cnt >= 13) {
+				for (int i = 0; i < 3; i++) {
+					if (tileCount[i * 9] >= 1) {
+						winningTileList[i] = true;
+					}
+					if (tileCount[(i + 1) * 9 - 1] >= 1) {
+						winningTileList[i] = true;
+					}
+				}
+				for (int i = 27; i < 34; i++) {
+					winningTileList[i] = true;
+				}
+			} else {
+				for (int i = 0; i < 3; i++) {
+					if (tileCount[i * 9] == 0) {
+						winningTileList[i] = true;
+					}
+					if (tileCount[(i + 1) * 9 - 1] == 0) {
+						winningTileList[i] = true;
+					}
+				}
+				for (int i = 27; i < 34; i++) {
+					if (tileCount[i] == 0) {
+						winningTileList[i] = true;
+					}
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private void print(int[] tileCount) {
+		int flag = 0;
+		for (int i = 0; i < 34; i++) {
+			if (i % 9 == 0) {
+				if (flag == 0) {
+					System.out.print("[");
+					flag = 1;
+				} else {
+					System.out.print("][");
+				}
+			} else {
+				System.out.print(",");
+			}
+			System.out.print(tileCount[i]);
+		}
+		System.out.println("]");
+	}
+
+	private List<Tile> parseHand(String handString) {
 		List<Tile> playerHand = new ArrayList<>();
 		for (int i = 0; i < handString.length(); i += 2) {
 			String s = handString.substring(i, i + 2);
@@ -47,137 +338,5 @@ public class WaitingHandChecker {
 			}
 		}
 		return playerHand;
-	}
-
-	public static boolean isWaitingHand(String handString) {
-		List<Tile> playerHand = parseHand(handString);
-		int[] tileCount = new int[34];
-		for (var t : playerHand) {
-			tileCount[(t.getKind() - 1) * 9 + (t.getValue() - 1)]++;
-		}
-		print(tileCount);
-		if (bt(tileCount, 0, false)) {
-			System.out.println("waiting hand");
-			return true;
-		}
-		return false;
-	}
-
-	public static boolean isWaitingHand(List<Tile> playerHand, Tile tile) {
-
-		int[] tileCount = new int[34];
-
-		tileCount[(tile.getKind() - 1) * 9 + (tile.getValue() - 1)]++;
-		for (var t : playerHand) {
-			tileCount[(t.getKind() - 1) * 9 + (t.getValue() - 1)]++;
-		}
-
-		print(tileCount);
-
-		if (bt(tileCount, 0, false)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private static boolean bt(int[] tileCount, int setCount, boolean hasHead) {
-
-		for (int i = 0; i < 34; i++) {
-			if (!hasHead) {
-				//雀頭候補を探す
-				if (tileCount[i] >= 2) {
-					tileCount[i] -= 2;
-					if (bt(tileCount, 0, true)) {
-						return true;
-					}
-					tileCount[i] += 2;
-				}
-			}
-			//面子を探す
-			//順子
-			if (i % 9 < 8 && i < 27 && tileCount[i] >= 1 && tileCount[i + 1] >= 1 && tileCount[i + 2] >= 1) {
-				tileCount[i] -= 1;
-				tileCount[i + 1] -= 1;
-				tileCount[i + 2] -= 1;
-				if (bt(tileCount, setCount + 1, hasHead)) {
-					return true;
-				}
-				tileCount[i] += 1;
-				tileCount[i + 1] += 1;
-				tileCount[i + 2] += 1;
-			}
-
-			//刻子
-			if (tileCount[i] >= 3) {
-				tileCount[i] -= 3;
-				if (bt(tileCount, setCount + 1, hasHead)) {
-					return true;
-				}
-				tileCount[i] += 3;
-			}
-
-		}
-
-		// 聴牌チェック
-		if (hasHead) {
-			if (setCount >= 3) {
-				for (int i = 0; i < 34; i++) {
-					//シャンポン
-					if (tileCount[i] == 2) {
-						return true;
-					}
-					// 数牌
-					if ((i % 9) < ((i + 1) % 9) && i < 27) {
-						//リャンメンorペンチャン
-						if (tileCount[i] == 1 && tileCount[i + 1] == 1) {
-							return true;
-						}
-					}
-
-					if ((i % 9) < ((i + 2) % 9) && i < 27) {
-						// カンチャン
-						if (tileCount[i] == 1 && tileCount[i + 2] == 1) {
-							return true;
-						}
-					}
-				}
-			}
-
-			// 七対子
-			int pairCount = 0;
-			for (var x : tileCount) {
-				if (x == 2) {
-					pairCount++;
-				}
-			}
-			if (pairCount >= 6) {
-				return true;
-			}
-
-		} else {
-			if (setCount == 4) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static void print(int[] tileCount) {
-		int flag = 0;
-		for (int i = 0; i < 34; i++) {
-			if (i % 9 == 0) {
-				if (flag == 0) {
-					System.out.print("[");
-					flag = 1;
-				} else {
-					System.out.print("][");
-				}
-			} else {
-				System.out.print(",");
-			}
-			System.out.print(tileCount[i]);
-		}
-		System.out.println("]");
 	}
 }

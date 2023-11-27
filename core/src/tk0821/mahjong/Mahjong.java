@@ -13,6 +13,8 @@ public class Mahjong extends ApplicationAdapter {
 	public static int mouseX;
 	public static int mouseY;
 
+	private boolean winFlag;
+	
 	private int tileW;
 	private int tileH;
 
@@ -30,6 +32,9 @@ public class Mahjong extends ApplicationAdapter {
 
 	Table table;
 	Player[] players;
+
+	WaitingHandChecker waitingHandChecker;
+	boolean[] winningTileList;
 
 	HandRenderer handRenderer;
 	DiscardRenderer discardRenderer;
@@ -57,11 +62,14 @@ public class Mahjong extends ApplicationAdapter {
 		handRenderer = new HandRenderer();
 		discardRenderer = new DiscardRenderer();
 
+		waitingHandChecker = new WaitingHandChecker();
+		winningTileList = waitingHandChecker.getWinningTileList();
+
 		currentPlayer = Table.PLAYER;
 
 		inputProcessor = new MyInputProcessor();
 		Gdx.input.setInputProcessor(inputProcessor);
-		
+
 	}
 
 	@Override
@@ -74,52 +82,75 @@ public class Mahjong extends ApplicationAdapter {
 			discardRenderer.draw(table.getDiscard(i), players[i].getId());
 		}
 		batch.end();
-	/*
-		if (time > 0.3f) {
+
+		if (time > 0.3f && !winFlag) {
 			if (table.canGetWallTop() && !players[currentPlayer].getHasTile()) {
 				drawTile();
 			} else if (currentPlayer != Table.PLAYER && players[currentPlayer].getHasTile()) {
 				discardTile();
+				
+				Tile tile = table.getDiscard(currentPlayer).get(table.getDiscard(currentPlayer).size() - 1);
+				
+				for (int i = currentPlayer - 1; i > Table.PLAYER; i--) {
+					
+				}
+				
+				if (winningTileList[(tile.getKind() - 1) * 9 + (tile.getValue() - 1)]) {
+					System.out.println("WIN");
+					winFlag = true;
+				}
+				currentPlayer = (currentPlayer + 1) % Table.PLAYERS;
+				
 			} else if (isClicked && currentPlayer == Table.PLAYER) {
-				WaitingHandChecker.isWaitingHand(players[0].getHand(), players[0].getTile());
-				playerTurn();
+				if (winningTileList[(players[0].getTile().getKind() - 1) * 9 + (players[0].getTile().getValue() - 1)]) {
+					System.out.println("WIN");
+					winFlag = true;
+				} else {
+					waitingHandChecker.isWaitingHand(players[0].getHand(), players[0].getTile());
+					playerTurn();
+					if (waitingHandChecker.isWaitingHand(players[0].getHand())) {
+						waitingHandChecker.parseWinningTileList();
+					}
+				}
 			} else if (!table.canGetWallTop()) {
 				System.out.println("drawn game");
 			}
 			time = 0;
 			isClicked = false;
 		}
-		
-		time+=Gdx.graphics.getDeltaTime();
-	*/
+
+		time += Gdx.graphics.getDeltaTime();
+
 	}
-	
+
 	private void drawTile() {
 		players[currentPlayer].setTile(table.getWallTop());
 	}
 
 	private void discardTile() {
-		table.addTileToDiscard(players[currentPlayer].discard(players[currentPlayer].getHand().size()), players[currentPlayer].getId());
-		currentPlayer = (currentPlayer + 1) % Table.PLAYERS;
+		table.addTileToDiscard(players[currentPlayer].discard(players[currentPlayer].getHand().size()),
+				players[currentPlayer].getId());
 	}
-	
+
 	private void playerTurn() {
-		if (players[currentPlayer].getHasTile()) {		
-			int index = (int) Math.floor((mouseX - HAND_X) / tileW);		
-			if (mouseX - HAND_X >= 0 && index < players[currentPlayer].getHand().size() && mouseY <= WINDOW_Y - HAND_Y && mouseY >= WINDOW_Y - HAND_Y - tileH) {			
+		if (players[currentPlayer].getHasTile()) {
+			int index = (int) Math.floor((mouseX - HAND_X) / tileW);
+			if (mouseX - HAND_X >= 0 && index < players[currentPlayer].getHand().size() && mouseY <= WINDOW_Y - HAND_Y
+					&& mouseY >= WINDOW_Y - HAND_Y - tileH) {
 				if (mouseY <= WINDOW_Y - HAND_Y && mouseY >= WINDOW_Y - HAND_Y - tileH) {
 					table.addTileToDiscard(players[currentPlayer].discard(index), players[currentPlayer].getId());
-				}				
-			} else if (index == players[currentPlayer].getHand().size() + 1) {				
-				table.addTileToDiscard(players[currentPlayer].discard(players[currentPlayer].getHand().size()),players[currentPlayer].getId());	
+				}
+			} else if (index == players[currentPlayer].getHand().size() + 1) {
+				table.addTileToDiscard(players[currentPlayer].discard(players[currentPlayer].getHand().size()),
+						players[currentPlayer].getId());
 			} else {
 				return;
 			}
 			players[currentPlayer].sortHand();
-			currentPlayer = Table.COM1;	
+			currentPlayer = Table.COM1;
 		}
 	}
-	
+
 	@Override
 	public void dispose() {
 		batch.dispose();
