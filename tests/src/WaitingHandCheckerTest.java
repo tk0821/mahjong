@@ -41,67 +41,67 @@ public class WaitingHandCheckerTest {
 	}
 	
 	@Test
-	public void parseWinningTileListIsTrue() {
+	public void parseWinningTileArrayIsTrue() {
 		WaitingHandChecker waitingHandChecker = new WaitingHandChecker();
 		
 		waitingHandChecker.isWaitingHand("1m1m2m2m3m3m4p5p6p東 東 東 中 ");
-		assertEquals("中 ", waitingHandChecker.parseWinningTileList());
+		assertEquals("中 ", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m1m2m2m3m3m4p5p東 東 東 中 中 ");
-		assertEquals("3p6p", waitingHandChecker.parseWinningTileList());
+		assertEquals("3p6p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m1m2m2m3m3m4p6p東 東 東 中 中 ");
-		assertEquals("5p", waitingHandChecker.parseWinningTileList());
+		assertEquals("5p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m1m2m2m3m3m1p2p東 東 東 中 中 ");
-		assertEquals("3p", waitingHandChecker.parseWinningTileList());
+		assertEquals("3p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m1m2m2m3m3m8p9p東 東 東 中 中 ");
-		assertEquals("7p", waitingHandChecker.parseWinningTileList());
+		assertEquals("7p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m1m2m2m3m3m2p3p4p5p6p中 中 ");
-		assertEquals("1p4p7p", waitingHandChecker.parseWinningTileList());
+		assertEquals("1p4p7p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m1m2m2m3m3m3p4p4p4p5p中 中 ");
-		assertEquals("4p中 ", waitingHandChecker.parseWinningTileList());
+		assertEquals("4p中 ", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m7m8m9m2p3p3p3p");
-		assertEquals("1p2p4p", waitingHandChecker.parseWinningTileList());
+		assertEquals("1p2p4p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m7m8m9m3p3p3p5p");
-		assertEquals("4p5p", waitingHandChecker.parseWinningTileList());
+		assertEquals("4p5p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m7m8m9m8p9p9p9p");
-		assertEquals("7p8p", waitingHandChecker.parseWinningTileList());
+		assertEquals("7p8p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m7m8m9m2p3p4p5p");
-		assertEquals("2p5p", waitingHandChecker.parseWinningTileList());
+		assertEquals("2p5p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m2p3p4p5p6p7p8p");
-		assertEquals("2p5p8p", waitingHandChecker.parseWinningTileList());
+		assertEquals("2p5p8p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m2p3p4p5p5p6p7p");
-		assertEquals("2p5p8p", waitingHandChecker.parseWinningTileList());
+		assertEquals("2p5p8p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m4p5p6p7p7p7p8p");
-		assertEquals("3p6p8p9p", waitingHandChecker.parseWinningTileList());
+		assertEquals("3p6p8p9p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m3p3p3p4p5p9p9p");
-		assertEquals("3p6p9p", waitingHandChecker.parseWinningTileList());
+		assertEquals("3p6p9p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m3p4p5p5p6p6p6p");
-		assertEquals("2p4p5p7p", waitingHandChecker.parseWinningTileList());
+		assertEquals("2p4p5p7p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m3p4p4p5p6p6p6p");
-		assertEquals("2p4p5p", waitingHandChecker.parseWinningTileList());
+		assertEquals("2p4p5p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m4p4p4p5p6p7p8p");
-		assertEquals("3p5p6p8p9p", waitingHandChecker.parseWinningTileList());
+		assertEquals("3p5p6p8p9p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m2m3m4m5m6m2p2p2p3p4p5p7p");
-		assertEquals("6p7p", waitingHandChecker.parseWinningTileList());
+		assertEquals("6p7p", waitingHandChecker.parseWinningTileArray());
 		
 		waitingHandChecker.isWaitingHand("1m1m1m2m3m4m5m6m7m8m9m9m9m");
-		assertEquals("1m2m3m4m5m6m7m8m9m", waitingHandChecker.parseWinningTileList());
+		assertEquals("1m2m3m4m5m6m7m8m9m", waitingHandChecker.parseWinningTileArray());
 	}
 }

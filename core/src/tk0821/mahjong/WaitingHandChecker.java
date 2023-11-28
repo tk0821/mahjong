@@ -5,19 +5,19 @@ import java.util.List;
 
 public class WaitingHandChecker {
 
-	private boolean[] winningTileList;
+	private boolean[] winningTileArray;
 	private int headTileIndex = -1;
 
 	public WaitingHandChecker() {
-		winningTileList = new boolean[34];
+		winningTileArray = new boolean[34];
 	}
 
-	public String parseWinningTileList() {
+	public String parseWinningTileArray() {
 
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < 27; i++) {
-			if (winningTileList[i]) {
+			if (winningTileArray[i]) {
 				sb.append(i % 9 + 1);
 
 				if (i < 9) {
@@ -30,39 +30,39 @@ public class WaitingHandChecker {
 			}
 		}
 
-		if (winningTileList[27]) {
+		if (winningTileArray[27]) {
 			sb.append("東 ");
 		}
-		if (winningTileList[28]) {
+		if (winningTileArray[28]) {
 			sb.append("南 ");
 		}
-		if (winningTileList[29]) {
+		if (winningTileArray[29]) {
 			sb.append("西 ");
 		}
-		if (winningTileList[30]) {
+		if (winningTileArray[30]) {
 			sb.append("北 ");
 		}
-		if (winningTileList[31]) {
+		if (winningTileArray[31]) {
 			sb.append("白 ");
 		}
-		if (winningTileList[32]) {
+		if (winningTileArray[32]) {
 			sb.append("發 ");
 		}
-		if (winningTileList[33]) {
+		if (winningTileArray[33]) {
 			sb.append("中 ");
 		}
 		System.out.println(sb);
 		return sb.toString();
 	}
 
-	public boolean[] getWinningTileList() {
-		return winningTileList;
+	public boolean[] getwinningTileArray() {
+		return winningTileArray;
 	}
 
 	public boolean isWaitingHand(String handString) {
 
 		for (int i = 0; i < 34; i++) {
-			winningTileList[i] = false;
+			winningTileArray[i] = false;
 		}
 
 		List<Tile> playerHand = parseHand(handString);
@@ -74,7 +74,7 @@ public class WaitingHandChecker {
 		if (!checkThirteenOrphans(tileCount)) {
 			bt(tileCount, 0, false);
 		}
-		for (var f : winningTileList) {
+		for (var f : winningTileArray) {
 			if (f) {
 				return true;
 			}
@@ -85,7 +85,7 @@ public class WaitingHandChecker {
 	public boolean isWaitingHand(List<Tile> playerHand, Tile tile) {
 
 		for (int i = 0; i < 34; i++) {
-			winningTileList[i] = false;
+			winningTileArray[i] = false;
 		}
 		
 		int[] tileCount = new int[34];
@@ -96,7 +96,7 @@ public class WaitingHandChecker {
 		if (!checkThirteenOrphans(tileCount)) {
 			bt(tileCount, 0, false);
 		}
-		for (var f : winningTileList) {
+		for (var f : winningTileArray) {
 			if (f) {
 				return true;
 			}
@@ -107,7 +107,7 @@ public class WaitingHandChecker {
 	public boolean isWaitingHand(List<Tile> playerHand) {
 
 		for (int i = 0; i < 34; i++) {
-			winningTileList[i] = false;
+			winningTileArray[i] = false;
 		}
 
 		int[] tileCount = new int[34];
@@ -118,7 +118,7 @@ public class WaitingHandChecker {
 		if (!checkThirteenOrphans(tileCount)) {
 			bt(tileCount, 0, false);
 		}
-		for (var f : winningTileList) {
+		for (var f : winningTileArray) {
 			if (f) {
 				return true;
 			}
@@ -160,17 +160,17 @@ public class WaitingHandChecker {
 			if (setCount >= 3) {
 				for (int i = 0; i < 34; i++) {
 					if (tileCount[i] == 2) {
-						winningTileList[i] = true;
-						winningTileList[headTileIndex] = true;
+						winningTileArray[i] = true;
+						winningTileArray[headTileIndex] = true;
 						return true;
 					}
 					if ((i % 9) < ((i + 1) % 9) && i < 27) {
 						if (tileCount[i] == 1 && tileCount[i + 1] == 1) {
 							if (i % 9 < 7) {
-								winningTileList[i + 2] = true;
+								winningTileArray[i + 2] = true;
 							}
 							if (i % 9 > 0) {
-								winningTileList[i - 1] = true;
+								winningTileArray[i - 1] = true;
 							}
 							return true;
 						}
@@ -178,7 +178,7 @@ public class WaitingHandChecker {
 
 					if ((i % 9) < ((i + 2) % 9) && i < 27) {
 						if (tileCount[i] == 1 && tileCount[i + 2] == 1) {
-							winningTileList[i + 1] = true;
+							winningTileArray[i + 1] = true;
 							return true;
 						}
 					}
@@ -190,7 +190,7 @@ public class WaitingHandChecker {
 
 				for (int i = 0; i < 34; i++) {
 					if (tileCount[i] == 1) {
-						winningTileList[i] = true;
+						winningTileArray[i] = true;
 					}
 				}
 				return true;
@@ -210,7 +210,7 @@ public class WaitingHandChecker {
 		if (pairCount >= 5) {
 			for (var x : tileCount) {
 				if (x == 1) {
-					winningTileList[x] = true;
+					winningTileArray[x] = true;
 				}
 			}
 			return true;
@@ -250,27 +250,27 @@ public class WaitingHandChecker {
 			if (!hasHead || cnt >= 13) {
 				for (int i = 0; i < 3; i++) {
 					if (tileCount[i * 9] >= 1) {
-						winningTileList[i] = true;
+						winningTileArray[i] = true;
 					}
 					if (tileCount[(i + 1) * 9 - 1] >= 1) {
-						winningTileList[i] = true;
+						winningTileArray[i] = true;
 					}
 				}
 				for (int i = 27; i < 34; i++) {
-					winningTileList[i] = true;
+					winningTileArray[i] = true;
 				}
 			} else {
 				for (int i = 0; i < 3; i++) {
 					if (tileCount[i * 9] == 0) {
-						winningTileList[i] = true;
+						winningTileArray[i] = true;
 					}
 					if (tileCount[(i + 1) * 9 - 1] == 0) {
-						winningTileList[i] = true;
+						winningTileArray[i] = true;
 					}
 				}
 				for (int i = 27; i < 34; i++) {
 					if (tileCount[i] == 0) {
-						winningTileList[i] = true;
+						winningTileArray[i] = true;
 					}
 				}
 			}
