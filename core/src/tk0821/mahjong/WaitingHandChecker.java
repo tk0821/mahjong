@@ -55,7 +55,7 @@ public class WaitingHandChecker {
 		return sb.toString();
 	}
 
-	public boolean[] getwinningTileArray() {
+	public boolean[] getWinningTileArray() {
 		return winningTileArray;
 	}
 
@@ -297,7 +297,7 @@ public class WaitingHandChecker {
 		System.out.println("]");
 	}
 
-	private List<Tile> parseHand(String handString) {
+	public List<Tile> parseHand(String handString) {
 		List<Tile> playerHand = new ArrayList<>();
 		for (int i = 0; i < handString.length(); i += 2) {
 			String s = handString.substring(i, i + 2);

@@ -1,5 +1,7 @@
 package tk0821.mahjong;
 
+import java.util.List;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -55,6 +57,9 @@ public class Mahjong extends ApplicationAdapter {
 	HandRenderer handRenderer;
 	DiscardRenderer discardRenderer;
 
+	List<String> yakuList;
+	int han;
+
 	@Override
 	public void create() {
 
@@ -93,7 +98,7 @@ public class Mahjong extends ApplicationAdapter {
 		fontGeneraror.dispose();
 
 		waitingHandChecker = new WaitingHandChecker();
-		winningTileArray = waitingHandChecker.getwinningTileArray();
+		winningTileArray = waitingHandChecker.getWinningTileArray();
 
 		currentPlayer = Table.PLAYER;
 
@@ -138,10 +143,18 @@ public class Mahjong extends ApplicationAdapter {
 				camera.unproject(v.set(mouseX, mouseY, 0));
 				if (v.x >= 600 && v.x <= 760 && v.y >= 130 && v.y <= 180) {
 					if (currentPlayer == Table.PLAYER) {
-						System.out.println("TSUMO");
+						System.out.println("TSUMO!");
 					} else {
 						System.out.println("RON");
 					}
+
+					System.out.println("*******************");
+					for (var s : yakuList)
+						System.out.println(s);
+					System.out.println("*******************");
+					System.out.println(han + "han");
+					System.out.println("xxxx points");
+
 					isClicked = false;
 				} else if (v.x >= 770 && v.x <= 930 && v.y >= 130 && v.y <= 180) {
 					System.out.println("CANCEL");
@@ -156,34 +169,25 @@ public class Mahjong extends ApplicationAdapter {
 				drawTile();
 				if (currentPlayer == Table.PLAYER) {
 					furitenFlag = false;
-					if (winningTileArray[(players[0].getTile().getKind() - 1) * 9
-							+ (players[0].getTile().getValue() - 1)]) {
-						winFlag = true;
+					if (checkWinning(players[currentPlayer].getHand(), players[currentPlayer].getTile())) {
+						System.out.println("check winning true");
 					}
 				}
 			} else if (currentPlayer != Table.PLAYER && players[currentPlayer].getHasTile()) {
 				discardTile();
-				Tile tile = table.getDiscard(currentPlayer).get(table.getDiscard(currentPlayer).size() - 1);
-				if (!furitenFlag && winningTileArray[(tile.getKind() - 1) * 9 + (tile.getValue() - 1)]) {
-					System.out.println("WIN");
-					winFlag = true;
-				} else {
+				if (!furitenFlag) {
+					Tile tile = table.getDiscard(currentPlayer).get(table.getDiscard(currentPlayer).size() - 1);
+					if (checkWinning(players[currentPlayer].getHand(), tile)) {
+						System.out.println("check winning true");
+					}
+				}
+				if (!winFlag) {
 					currentPlayer = (currentPlayer + 1) % Table.PLAYERS;
 				}
 			} else if (isClicked && currentPlayer == Table.PLAYER) {
 				if (!winFlag) {
 					waitingHandChecker.isWaitingHand(players[0].getHand(), players[0].getTile());
 					playerTurn();
-					if (waitingHandChecker.isWaitingHand(players[0].getHand())) {
-						waitingHandChecker.parseWinningTileArray();
-						for (int i = 0; i < table.getDiscard(currentPlayer).size(); i++) {
-							Tile tile = table.getDiscard(currentPlayer).get(i);
-							if (winningTileArray[(tile.getKind() - 1) * 9 + (tile.getValue() - 1)]) {
-								furitenFlag = true;
-								break;
-							}
-						}
-					}
 				}
 			} else if (!table.canGetWallTop()) {
 				System.out.println("drawn game");
@@ -196,6 +200,18 @@ public class Mahjong extends ApplicationAdapter {
 
 	}
 
+	private void setCompleteHandFlags(CompleteHand completeHand) {
+		completeHand.setTsumo(currentPlayer == Table.PLAYER);
+		completeHand.setCalling(false); //未実装
+		completeHand.setRiichi(false); //未実装
+		completeHand.setDoubleRiichi(false); //未実装
+		completeHand.setIppatsu(false); //未実装
+		completeHand.setKan(false); // 未実装
+		completeHand.setLastTile(!table.canGetWallTop());
+		completeHand.setPrevalentWindIndex(27); // 東
+		completeHand.setSeatWindIndex(27); // 東
+	}
+
 	private void drawTile() {
 		players[currentPlayer].setTile(table.getWallTop());
 	}
@@ -203,6 +219,40 @@ public class Mahjong extends ApplicationAdapter {
 	private void discardTile() {
 		table.addTileToDiscard(players[currentPlayer].discard(players[currentPlayer].getHand().size()),
 				players[currentPlayer].getId());
+	}
+
+	private boolean checkWinning(List<Tile> hand, Tile tile) {
+		if (winningTileArray[parseTileToArrayIndex(tile)]) {
+			CompleteHand completeHand = new CompleteHand(hand, tile);
+			setCompleteHandFlags(completeHand);
+			WinningChecker winningChecker = new WinningChecker(completeHand);
+			yakuList = winningChecker.getYakuList();
+			han = winningChecker.getMaxHan();
+			winFlag = winningChecker.isWinning();
+			return true;
+		}
+		return false;
+	}
+
+	private boolean checkDiscard() {
+		if (waitingHandChecker.isWaitingHand(players[0].getHand())) {
+			waitingHandChecker.parseWinningTileArray();
+			for (int i = 0; i < table.getDiscard(currentPlayer).size(); i++) {
+				Tile tile = table.getDiscard(currentPlayer).get(i);
+				if (winningTileArray[parseTileToArrayIndex(tile)]) {
+					System.out.println(parseTileToArrayIndex(tile));
+					System.out.println(winningTileArray[parseTileToArrayIndex(tile)]);
+					furitenFlag = true;
+					System.out.println(furitenFlag);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private int parseTileToArrayIndex(Tile tile) {
+		return (tile.getKind() - 1) * 9 + (tile.getValue() - 1);
 	}
 
 	private void playerTurn() {
@@ -220,6 +270,7 @@ public class Mahjong extends ApplicationAdapter {
 				return;
 			}
 			players[currentPlayer].sortHand();
+			checkDiscard();
 			currentPlayer = Table.COM1;
 		}
 	}
