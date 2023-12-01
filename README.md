@@ -5,3 +5,6 @@
 
 麻雀王国  
 https://mj-king.net/sozai/
+
+聴牌機能のテストのためにこちらのコードを使用しております。  
+https://github.com/TomGrill/gdx-testing
