@@ -10,6 +10,7 @@ public class WinningChecker {
 	private int[] tileCount;
 	private int[][] completeHand;
 	private int han;
+	private int openIndex;
 
 	private int HonorTilesCount;
 
@@ -27,13 +28,19 @@ public class WinningChecker {
 		completeHand = new int[5][];
 		tileCount = new int[34];
 
+		int[][] openHandSet = hand.getOpenHandSet();
+		if (openHandSet != null) {
+			while (openHandSet[openIndex] != null) {
+				completeHand[openIndex] = openHandSet[openIndex];
+				openIndex += 1;
+			}
+		}
 		for (var t : hand.getHand()) {
 			tileCount[(t.getKind() - 1) * 9 + (t.getValue() - 1)] += 1;
 		}
 
-		//private boolean bt(int[] tileCount, int completeHandCount, boolean hasHead, int tileIndex, int completeHandIndex) {
-
-		bt(tileCount, 0, false, (hand.getWinningTile().getKind() - 1) * 9 + (hand.getWinningTile().getValue() - 1), 0);
+		bt(tileCount, openIndex, false,
+				(hand.getWinningTile().getKind() - 1) * 9 + (hand.getWinningTile().getValue() - 1), openIndex);
 
 		if (isWinning) {
 			for (var s : getYakuList()) {
@@ -284,14 +291,68 @@ public class WinningChecker {
 		han += 2;
 		return true;
 	}
-	
+
+	private boolean isTriplets(int[] set) {
+		if (set.length >= 3) {
+			if (set[0] != set[1] || set[1] != set[2]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	// 対々和
 	private boolean checkAllTriplets() {
-		
+		for (var set : completeHand) {
+			if (set.length != 2) {
+				if (!isTriplets(set)) {
+					return false;
+				}
+			}
+		}
+		han += 2;
+		return true;
 	}
-	
+
 	// 三暗刻
+	private boolean checkThreeConcealedTriplets() {
+		int count = 0;
+		for (int i = openIndex; i < completeHand.length; i++) {
+			if (isTriplets(completeHand[i])) {
+				count += 1;
+			}
+		}
+		if (count == 3) {
+			han += 2;
+			return true;
+		}
+		return false;
+	}
+
 	// 三色同刻
+	private boolean MixedTriplets() {
+
+		int count = 0;
+
+		for (int i = 0; i < completeHand.length - 2; i++) {
+			count = 0;
+			if (isTriplets(completeHand[i])) {
+				for (int j = i + 1; j < completeHand.length; j++) {
+					if (isTriplets(completeHand[j])) {
+						if (completeHand[i][0] == completeHand[j][0]) {
+							count += 1;
+							if (count == 3) {
+								han += 2;
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	// 三色同順
 	// 混老頭
 	// 一気通貫
