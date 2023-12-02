@@ -330,16 +330,17 @@ public class WinningChecker {
 	}
 
 	// 三色同刻
-	private boolean MixedTriplets() {
+	private boolean checkMixedTriplets() {
 
 		int count = 0;
+		int kind = 0;
 
 		for (int i = 0; i < completeHand.length - 2; i++) {
 			count = 0;
-			if (isTriplets(completeHand[i])) {
+			if (isSuits(completeHand[i][0]) && isTriplets(completeHand[i])) {
 				for (int j = i + 1; j < completeHand.length; j++) {
-					if (isTriplets(completeHand[j])) {
-						if (completeHand[i][0] == completeHand[j][0]) {
+					if (isSuits(completeHand[j][0]) && isTriplets(completeHand[j])) {
+						if (isSameValue(completeHand[i][0], completeHand[j][0])) {
 							count += 1;
 							if (count == 3) {
 								han += 2;
@@ -353,12 +354,153 @@ public class WinningChecker {
 		return false;
 	}
 
+	private boolean isSameKind(int index1, int index2) {
+		return Math.floor((double) index1 / 9) == Math.floor((double) index2 / 9);
+	}
+
+	private boolean isSameValue(int index1, int index2) {
+		if (isHonours(index1) || isHonours(index2))
+			return false;
+		return index1 % 9 == index2 % 9;
+	}
+
 	// 三色同順
+	private boolean checkMixedSequences() {
+		for (int i = 0; i < completeHand.length - 2; i++) {
+			if (isSequence(completeHand[i])) {
+				int secondIndex = -1;
+				for (int j = i + 1; j < completeHand.length; j++) {
+					if (isSequence(completeHand[j])
+							&& !isSameKind(completeHand[i][0], completeHand[j][0])
+							&& !isSameValue(completeHand[i][0], completeHand[j][0])) {
+						if (secondIndex == -1) {
+							secondIndex = completeHand[j][0];
+						} else if (completeHand[j][0] != secondIndex) {
+							han += 2;
+							if (hand.isCalling()) {
+								han -= 1;
+							}
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean isTerminals(int[] set) {
+		if (isHonours(set[0]))
+			return false;
+		for (var index : set) {
+			if (index % 9 == 0 || index % 9 == 8) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isAllTerminals(int[] set) {
+		if (isTriplets(set)) {
+			return isTerminals(set);
+		}
+		return false;
+	}
+
 	// 混老頭
+	private boolean checkAllTerminalsAndHonors() {
+
+		for (var set : completeHand) {
+			if (!isHonours(set[0]) && !isAllTerminals(set)) {
+				return false;
+			}
+		}
+		han += 2;
+		return true;
+	}
+
 	// 一気通貫
+	private boolean checkFullStraight() {
+
+		for (int i = 0; i < completeHand.length - 2; i++) {
+			if (!isSequence(completeHand[i]) || completeHand[i][0] % 3 != 0)
+				continue;
+			for (int j = i + 1; j < completeHand.length - 1; j++) {
+				if (!isSequence(completeHand[j]) || completeHand[j][0] % 3 != 0
+						|| completeHand[i][0] % 3 != completeHand[j][0] % 3)
+					continue;
+				for (int k = j + 1; k < completeHand.length; k++) {
+					if (!isSequence(completeHand[k]) || completeHand[k][0] % 3 != 0
+							|| completeHand[i][0] % 3 != completeHand[k][0] % 3
+							|| completeHand[j][0] % 3 != completeHand[k][0] % 3)
+						continue;
+					han += 2;
+					if (hand.isCalling())
+						han -= 1;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	// チャンタ
+	private boolean checkCommonEnds() {
+		for (var set : completeHand) {
+			if (!isHonours(set[0]) && !isTerminals(set)) {
+				return false;
+			}
+		}
+		han += 2;
+		if (hand.isCalling())
+			han -= 1;
+		return true;
+	}
+
+	private boolean isDragons(int index) {
+		return index > 30;
+	}
+
 	// 小三元
+	private boolean checkLittleThreeDragons() {
+		int count = 0;
+		boolean hasHead = false;
+		for (var set : completeHand) {
+			if (isDragons(set[0])) {
+				if (isTriplets(set))
+					count += 1;
+				if (set.length == 2)
+					hasHead = true;
+			}
+		}
+		if (count == 2 && hasHead) {
+			han += 2;
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isKan(int[] set) {
+		if (set.length == 4) {
+			return true;
+		}
+		return false;
+	}
+
 	// 三槓子
+	private boolean checkThreeKan() {
+		int count = 0;
+		for (var set : completeHand) {
+			if (isKan(set)) {
+				count += 1;
+			}
+		}
+		if (count == 3) {
+			han += 2;
+			return true;
+		}
+		return false;
+	}
 
 	// 混一色
 	// 純チャン
