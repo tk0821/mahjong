@@ -27,6 +27,7 @@ public class WinningChecker {
 		this.hand = hand;
 		completeHand = new int[5][];
 		tileCount = new int[34];
+		maxHan = 0;
 
 		int[][] openHandSet = hand.getOpenHandSet();
 		if (openHandSet != null) {
@@ -41,28 +42,11 @@ public class WinningChecker {
 
 		bt(tileCount, openIndex, false,
 				(hand.getWinningTile().getKind() - 1) * 9 + (hand.getWinningTile().getValue() - 1), openIndex);
-
-		if (isWinning) {
-			for (var s : getYakuList()) {
-				System.out.println(s);
-			}
-
-			for (var s : maxHanCompleteHand) {
-				for (var x : s) {
-					System.out.print(x);
-				}
-				System.out.print(" ");
-			}
-			System.out.println();
-		}
 	}
 
 	private void checkYaku() {
 		List<String> yakuList = new ArrayList<>();
-
 		han = 0;
-		maxHan = 0;
-
 		if (checkTsumo())
 			yakuList.add("Tsumo：1 han");
 		if (checkRiichi())
@@ -87,6 +71,34 @@ public class WinningChecker {
 			yakuList.add("Last Tile Draw：1 han");
 		if (checkLastTileClaim())
 			yakuList.add("Last Tile Claim：1 han");
+		if (checkSevenPairs())
+			yakuList.add("Seven Pairs：2 han");
+		if (checkAllTriplets())
+			yakuList.add("All Triplets：2 han");
+		if (checkThreeConcealedTriplets())
+			yakuList.add("Three Concealed Triplets：2 han");
+		if (checkMixedTriplets())
+			yakuList.add("Mixed Triplets：2 han");
+		if (checkMixedSequences())
+			yakuList.add("Mixed Sequences：" + (hand.isCalling() ? 1 : 2) + " han");
+		if (checkAllTerminalsAndHonors())
+			yakuList.add("All Terminals and Honors：2 han");
+		if (checkFullStraight())
+			yakuList.add("Full Straight：" + (hand.isCalling() ? 1 : 2) + " han");
+		if (checkCommonEnds())
+			yakuList.add("Common Ends：" + (hand.isCalling() ? 1 : 2) + " han");
+		if (checkLittleThreeDragons())
+			yakuList.add("Little Three Dragons：2 han");
+		if (checkThreeKan())
+			yakuList.add("Three Kan：2 han");
+		if (checkHalfFlush())
+			yakuList.add("Half Flush：" + (hand.isCalling() ? 2 : 3) + " han");
+		if (checkCommonTerminals())
+			yakuList.add("Common Terminals：" + (hand.isCalling() ? 2 : 3) + " han");
+		if (checkDoubleTwinSequences())
+			yakuList.add("Double Twin Sequences：3 han");
+		if (checkFullFlush())
+			yakuList.add("Full Flush：" + (hand.isCalling() ? 5 : 6) + " han");
 
 		if (maxHan < han) {
 			this.setYakuList(yakuList);
@@ -145,7 +157,7 @@ public class WinningChecker {
 		return index < 27;
 	}
 
-	private boolean isHonours(int index) {
+	private boolean isHonors(int index) {
 		return index >= 27;
 	}
 
@@ -156,7 +168,7 @@ public class WinningChecker {
 		if (index == hand.getSeatWindIndex()) {
 			return true;
 		}
-		if (index >= 31) {
+		if (isDragons(index)) {
 			return true;
 		}
 		return false;
@@ -167,8 +179,8 @@ public class WinningChecker {
 			return false;
 		}
 		if (isSuits(set[0])) {
-			if (set[0] == set[1] - 1 || set[1] == set[2] - 1) {
-				if (set[0] % 9 < set[0] % 9) {
+			if (set[0] == set[1] - 1 && set[1] == set[2] - 1) {
+				if (isSameKind(set[0], set[2])) {
 					return true;
 				}
 			}
@@ -359,7 +371,7 @@ public class WinningChecker {
 	}
 
 	private boolean isSameValue(int index1, int index2) {
-		if (isHonours(index1) || isHonours(index2))
+		if (isHonors(index1) || isHonors(index2))
 			return false;
 		return index1 % 9 == index2 % 9;
 	}
@@ -372,7 +384,7 @@ public class WinningChecker {
 				for (int j = i + 1; j < completeHand.length; j++) {
 					if (isSequence(completeHand[j])
 							&& !isSameKind(completeHand[i][0], completeHand[j][0])
-							&& !isSameValue(completeHand[i][0], completeHand[j][0])) {
+							&& isSameValue(completeHand[i][0], completeHand[j][0])) {
 						if (secondIndex == -1) {
 							secondIndex = completeHand[j][0];
 						} else if (completeHand[j][0] != secondIndex) {
@@ -390,7 +402,7 @@ public class WinningChecker {
 	}
 
 	private boolean isTerminals(int[] set) {
-		if (isHonours(set[0]))
+		if (isHonors(set[0]))
 			return false;
 		for (var index : set) {
 			if (index % 9 == 0 || index % 9 == 8) {
@@ -401,7 +413,7 @@ public class WinningChecker {
 	}
 
 	private boolean isAllTerminals(int[] set) {
-		if (isTriplets(set)) {
+		if (isTriplets(set) || set.length == 2) {
 			return isTerminals(set);
 		}
 		return false;
@@ -411,7 +423,7 @@ public class WinningChecker {
 	private boolean checkAllTerminalsAndHonors() {
 
 		for (var set : completeHand) {
-			if (!isHonours(set[0]) && !isAllTerminals(set)) {
+			if (!isHonors(set[0]) && !isAllTerminals(set)) {
 				return false;
 			}
 		}
@@ -447,7 +459,7 @@ public class WinningChecker {
 	// チャンタ
 	private boolean checkCommonEnds() {
 		for (var set : completeHand) {
-			if (!isHonours(set[0]) && !isTerminals(set)) {
+			if (!isHonors(set[0]) && !isTerminals(set)) {
 				return false;
 			}
 		}
@@ -503,12 +515,93 @@ public class WinningChecker {
 	}
 
 	// 混一色
-	// 純チャン
-	// 二盃口
+	private boolean checkHalfFlush() {
 
-	// 流し満貫
+		boolean hasSuit = false;
+		for (int i = 0; i < completeHand.length - 1; i++) {
+			if (isHonors(completeHand[i][0]))
+				continue;
+			hasSuit = true;
+			for (int j = i + 1; j < completeHand.length; j++) {
+				if (isHonors(completeHand[j][0]))
+					continue;
+				if (!isSameKind(completeHand[i][0], completeHand[j][0])) {
+					return false;
+				}
+			}
+		}
+		if (hasSuit) {
+			han += 3;
+			if (hand.isCalling())
+				han -= 1;
+			return true;
+		}
+		return false;
+	}
+
+	// 純チャン
+	private boolean checkCommonTerminals() {
+		for (var set : completeHand) {
+			if (!isTerminals(set)) {
+				return false;
+			}
+		}
+		han += 3;
+		if (hand.isCalling())
+			han -= 1;
+		return true;
+	}
+
+	// 二盃口
+	private boolean checkDoubleTwinSequences() {
+		if (hand.isCalling())
+			return false;
+		int count = 0;
+		int skipIndex = -1;
+		for (int i = 0; i < completeHand.length; i++) {
+			if (completeHand[i].length == 2 || !isSequence(completeHand[i])) {
+				continue;
+			}
+			if (i == skipIndex) {
+				continue;
+			}
+			for (int j = i + 1; j < completeHand.length; j++) {
+				if (completeHand[j].length == 2 || !isSequence(completeHand[i])) {
+					continue;
+				}
+				if (completeHand[i][0] == completeHand[j][0]) {
+					skipIndex = j;
+					count += 1;
+				}
+			}
+		}
+		if (count == 2) {
+			han += 3;
+			return true;
+		}
+
+		return false;
+	}
 
 	// 清一色
+	private boolean checkFullFlush() {
+		int index = completeHand[0][0];
+		if (isHonors(index)) {
+			return false;
+		}
+		for (int i = 1; i < completeHand.length; i++) {
+			if (!isSameKind(index, completeHand[i][0])) {
+				return false;
+			}
+		}
+		han += 6;
+		if (hand.isCalling()) {
+			han -= 1;
+		}
+		return true;
+	}
+
+	// 流し満貫
 
 	// 天和
 	// 地和

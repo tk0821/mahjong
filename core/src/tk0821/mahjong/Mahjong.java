@@ -81,6 +81,7 @@ public class Mahjong extends ApplicationAdapter {
 		for (int i = 0; i < Table.PLAYERS; i++) {
 			players[i] = new Player(i);
 			players[i].setHand(table.dealHand());
+			players[i].setOpenHandSet(new int[4][]);
 			players[i].sortHand();
 		}
 
@@ -152,7 +153,7 @@ public class Mahjong extends ApplicationAdapter {
 					for (var s : yakuList)
 						System.out.println(s);
 					System.out.println("*******************");
-					System.out.println(han + "han");
+					System.out.println(han + " han");
 					System.out.println("xxxx points");
 
 					isClicked = false;
@@ -177,7 +178,7 @@ public class Mahjong extends ApplicationAdapter {
 				discardTile();
 				if (!furitenFlag) {
 					Tile tile = table.getDiscard(currentPlayer).get(table.getDiscard(currentPlayer).size() - 1);
-					if (checkWinning(players[currentPlayer].getHand(), tile)) {
+					if (checkWinning(players[Table.PLAYER].getHand(), tile)) {
 						System.out.println("check winning true");
 					}
 				}
@@ -223,7 +224,7 @@ public class Mahjong extends ApplicationAdapter {
 
 	private boolean checkWinning(List<Tile> hand, Tile tile) {
 		if (winningTileArray[parseTileToArrayIndex(tile)]) {
-			CompleteHand completeHand = new CompleteHand(hand, tile);
+			CompleteHand completeHand = new CompleteHand(hand, players[Table.PLAYER].getOpenHandSet(), tile);
 			setCompleteHandFlags(completeHand);
 			WinningChecker winningChecker = new WinningChecker(completeHand);
 			yakuList = winningChecker.getYakuList();

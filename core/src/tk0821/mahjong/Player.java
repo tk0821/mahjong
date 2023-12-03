@@ -7,6 +7,7 @@ public class Player {
 	
 	private int id;
 	private List<Tile> hand;
+	private int[][] openHandSet;
 	private Tile tile;
 	private boolean hasTile;
 
@@ -58,5 +59,13 @@ public class Player {
 		}
 		hand.add(tile);
 		return hand.remove(index);
+	}
+
+	public int[][] getOpenHandSet() {
+		return openHandSet;
+	}
+
+	public void setOpenHandSet(int[][] openHandSet) {
+		this.openHandSet = openHandSet;
 	}
 }
