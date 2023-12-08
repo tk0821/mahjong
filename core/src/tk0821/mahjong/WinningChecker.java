@@ -47,6 +47,61 @@ public class WinningChecker {
 	private void checkYaku() {
 		List<String> yakuList = new ArrayList<>();
 		han = 0;
+
+		boolean isLimit = false;
+		if (checkBlessingOfHeaven()) {
+			yakuList.add("Blessing of Heaven：Limit");
+			isLimit = true;
+		}
+		if (checkBlessingOfEarth()) {
+			yakuList.add("Blessing of Earth：Limit");
+			this.setYakuList(yakuList);
+			isLimit = true;
+		}
+		if (checkAllGreen()) {
+			yakuList.add("All Green：Limit");
+			isLimit = true;
+		}
+		if (checkBigThreeDragons()) {
+			yakuList.add("Big Three Dragons：Limit");
+			isLimit = true;
+		}
+		if (checkAllHonors()) {
+			yakuList.add("All Honors：Limit");
+			isLimit = true;
+		}
+		if (checkThirteenOrphans()) {
+			yakuList.add("Thirteen Orphans：Limit");
+			isLimit = true;
+		}
+		if (checkNineGates()) {
+			yakuList.add("Nine Gates：Limit");
+			isLimit = true;
+		}
+		if (checkFourConcealedTriplets()) {
+			yakuList.add("Four Concealed Triplets：Limit");
+			isLimit = true;
+		}
+		if (checkAllTerminals()) {
+			yakuList.add("All Terminals：Limit");
+			isLimit = true;
+		}
+		if (checkFourKan()) {
+			yakuList.add("Four Kan：Limit");
+			isLimit = true;
+		}
+		if (checkBigFourWinds()) {
+			yakuList.add("Big Four Winds：Limit");
+			isLimit = true;
+		}
+		if (isLimit) {
+			this.setYakuList(yakuList);
+			setWinning(true);
+			maxHan = 100;
+			maxHanCompleteHand = completeHand.clone();
+			return;
+		}
+		
 		if (checkTsumo())
 			yakuList.add("Tsumo：1 han");
 		if (checkRiichi())
@@ -345,7 +400,6 @@ public class WinningChecker {
 	private boolean checkMixedTriplets() {
 
 		int count = 0;
-		int kind = 0;
 
 		for (int i = 0; i < completeHand.length - 2; i++) {
 			count = 0;
@@ -604,20 +658,203 @@ public class WinningChecker {
 	// 流し満貫
 
 	// 天和
+	private boolean checkBlessingOfHeaven() {
+		if (hand.getSeatWindIndex() == Tile.EAST && hand.isTsumo()) {
+			if (!hand.isKan()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// 地和
-	// 人和
+	private boolean checkBlessingOfEarth() {
+		if (hand.getSeatWindIndex() != Tile.EAST && hand.isTsumo()) {
+			if (!hand.isKan()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isBamboo(int index) {
+		return index >= 18 && index < 27;
+	}
+
 	// 緑一色
+	private boolean checkAllGreen() {
+		for (var set : completeHand) {
+			if (isBamboo(set[0])) {
+				for (var tile : set) {
+					switch (tile % 9) {
+					case 1:
+					case 2:
+					case 3:
+					case 5:
+					case 7:
+						break;
+					default:
+						return false;
+					}
+				}
+			} else if (set[0] != 32) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	// 大三元
+	private boolean checkBigThreeDragons() {
+		int count = 0;
+		for (var set : completeHand) {
+			if (isDragons(set[0]) && isTriplets(set)) {
+				count += 1;
+			}
+		}
+		if (count == 3) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isWinds(int index) {
+		return index >= 27 && index < 31;
+	}
+
 	// 小四喜
+	private boolean checkLittleFourWinds() {
+		int count = 0;
+		int pair = 0;
+		for (var set : completeHand) {
+			if (isWinds(set[0])) {
+				if (set.length == 2) {
+					pair += 1;
+				}
+				count += 1;
+			}
+		}
+		if (pair == 1 && count == 4) {
+			return true;
+		}
+		return false;
+	}
+
 	// 字一色
+	private boolean checkAllHonors() {
+		for (var set : completeHand) {
+			if (!isHonors(set[0])) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	// 国士無双
+	private boolean checkThirteenOrphans() {
+		int count = 0;
+		for (var set : completeHand) {
+			if (isTerminals(set) || isHonors(set[0])) {
+				count += 1;
+			} else {
+				return false;
+			}
+		}
+		if (count == 13) {
+			return true;
+		}
+		return false;
+	}
+
 	// 九蓮宝燈
+	private boolean checkNineGates() {
+		if (hand.isCalling()) {
+			return false;
+		}
+		int[] counts = new int[9];
+		int kind = completeHand[0][0];
+		if (!isHonors(kind)) {
+			return false;
+		}
+		for (var set : completeHand) {
+			if (!isSameKind(kind, set[0])) {
+				return false;
+			}
+			for (var index : set) {
+				counts[index % 9] += 1;
+			}
+		}
+		if (counts[0] >= 3 && counts[8] >= 3) {
+			for (int i = 1; i < 8; i++) {
+				if (counts[i] == 0) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
 	// 四暗刻
+	private boolean checkFourConcealedTriplets() {
+		if (hand.isCalling()) {
+			return false;
+		}
+		int count = 0;
+		for (var set : completeHand) {
+			if (isTriplets(set)) {
+				count += 1;
+			}
+		}
+		if (count == 4) {
+			return true;
+		}
+		return false;
+	}
+
 	// 清老頭
+	private boolean checkAllTerminals() {
+		int count = 0;
+		for (var set : completeHand) {
+			if (isTerminals(set)) {
+				count += 1;
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	// 四槓子
+	private boolean checkFourKan() {
+		int count = 0;
+		for (var set : completeHand) {
+			if (isKan(set)) {
+				count += 1;
+			}
+		}
+		if (count == 4) {
+			return true;
+		}
+		return false;
+	}
+
+	// 大四喜
+	private boolean checkBigFourWinds() {
+		int count = 0;
+		int pair = 0;
+		for (var set : completeHand) {
+			if (isWinds(set[0]) && isTriplets(set)) {
+				count += 1;
+			}
+		}
+		if (count == 4) {
+			return true;
+		}
+		return false;
+	}
 
 	// 四暗刻単騎
-	// 大四喜
 	// 純正九蓮宝燈
 	// 国士無双十三面待ち
 
